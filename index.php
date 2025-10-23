@@ -1,10 +1,9 @@
 <?php
 /**
- * Homepage - Display all blog posts
- * Save as: index.php (root folder)
+ * Homepage - WITH ADMIN DELETE BUTTONS
+ * Save as: index.php
  */
 
-// Load configuration and functions
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/blog.php';
@@ -13,7 +12,6 @@ $pageTitle = 'Home';
 $currentUser = getCurrentUser();
 $posts = getAllPosts();
 
-// Include header
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -24,7 +22,11 @@ include __DIR__ . '/includes/header.php';
                 <h1 class="card-title">Welcome to <?php echo SITE_NAME; ?></h1>
                 <p style="color: var(--text-light);">
                     <?php if ($currentUser): ?>
-                        Hello, <?php echo htmlspecialchars($currentUser['username']); ?>! Browse posts below or create your own.
+                        Hello, <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
+                        <?php if (isAdmin()): ?>
+                            <span style="background: #ef4444; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">ADMIN</span>
+                        <?php endif; ?>
+                        ! Browse posts below or create your own.
                     <?php else: ?>
                         A simple blogging platform. <a href="pages/register.php">Register</a> or <a href="pages/login.php">Login</a> to start blogging!
                     <?php endif; ?>
@@ -60,12 +62,51 @@ include __DIR__ . '/includes/header.php';
                             <div class="post-excerpt">
                                 <?php echo htmlspecialchars(getExcerpt($post['content'])); ?>
                             </div>
-                            <a href="pages/view-post.php?id=<?php echo $post['id']; ?>" class="btn btn-primary btn-sm">Read More</a>
+                            <div class="card-actions">
+                                <a href="pages/view-post.php?id=<?php echo $post['id']; ?>" class="btn btn-primary btn-sm">Read More</a>
+                                
+                                <?php if ($currentUser): ?>
+                                    <?php if ($currentUser['id'] == $post['user_id'] || isAdmin()): ?>
+                                        <a href="pages/edit-post.php?id=<?php echo $post['id']; ?>" class="btn btn-success btn-sm">Edit</a>
+                                        <button onclick="deletePostFromHome(<?php echo $post['id']; ?>)" class="btn btn-danger btn-sm">Delete</button>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </div>
                         </article>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>
     </main>
+
+    <script>
+        function deletePostFromHome(postId) {
+            if (!confirm('⚠️ Are you sure you want to delete this post?\n\nThis action cannot be undone!')) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('post_id', postId);
+            formData.append('csrf_token', '<?php echo getCSRFToken(); ?>');
+
+            fetch('<?php echo SITE_URL; ?>/api/delete-post-handler.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    location.reload();
+                } else {
+                    alert('❌ ' + result.message);
+                }
+            })
+            .catch(error => {
+                alert('❌ An error occurred. Please try again.');
+                console.error('Error:', error);
+            });
+        }
+    </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Authentication Functions - FIXED VERSION
+ * Authentication Functions - FINAL CORRECTED VERSION (Using getDB() function)
  * Save as: includes/auth.php
  */
 
@@ -8,13 +8,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// FIX 1: Require database.php using the correct path (up from 'includes', into 'config')
 require_once __DIR__ . '/../config/database.php';
+
 
 /**
  * Register new user
  */
 function registerUser($username, $email, $password) {
-    $db = getDB();
+    $db = getDB(); // FIX 2: Use getDB()
     $errors = [];
     
     // Validate
@@ -34,7 +36,7 @@ function registerUser($username, $email, $password) {
     
     // Check if exists
     try {
-        $stmt = $db->prepare("SELECT id FROM user WHERE username = ? OR email = ?");
+        $stmt = $db->prepare("SELECT id FROM user WHERE username = ? OR email = ?"); // Use $db
         $stmt->execute([$username, $email]);
         
         if ($stmt->fetch()) {
@@ -42,8 +44,8 @@ function registerUser($username, $email, $password) {
         }
         
         // Insert user
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT, ['cost' => HASH_COST]);
-        $stmt = $db->prepare("INSERT INTO user (username, email, password, role) VALUES (?, ?, ?, 'user')");
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT, ['cost' => HASH_COST]); 
+        $stmt = $db->prepare("INSERT INTO user (username, email, password, role) VALUES (?, ?, ?, 'user')"); // Use $db
         $stmt->execute([$username, $email, $hashedPassword]);
         
         return ['success' => true, 'message' => 'Registration successful!'];
@@ -56,10 +58,10 @@ function registerUser($username, $email, $password) {
  * Login user
  */
 function loginUser($username, $password) {
-    $db = getDB();
+    $db = getDB(); // FIX 2: Use getDB()
     
     try {
-        $stmt = $db->prepare("SELECT * FROM user WHERE username = ? OR email = ?");
+        $stmt = $db->prepare("SELECT * FROM user WHERE username = ? OR email = ?"); // Use $db
         $stmt->execute([$username, $username]);
         $user = $stmt->fetch();
         
@@ -86,6 +88,7 @@ function loginUser($username, $password) {
  * Logout user
  */
 function logoutUser() {
+    // Note: This function correctly uses session/cookie management only.
     $_SESSION = [];
     if (isset($_COOKIE[session_name()])) {
         setcookie(session_name(), '', time() - 3600, '/');
@@ -97,6 +100,7 @@ function logoutUser() {
  * Check if logged in
  */
 function isLoggedIn() {
+    // Note: SESSION_LIFETIME is defined in database.php
     if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         return false;
     }
@@ -130,6 +134,7 @@ function getCurrentUser() {
  * Require login
  */
 function requireLogin() {
+    // Note: SITE_URL is defined in database.php
     if (!isLoggedIn()) {
         header("Location: " . SITE_URL . "/pages/login.php");
         exit;
@@ -152,4 +157,3 @@ function getCSRFToken() {
 function verifyCSRF($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
-?>

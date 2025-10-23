@@ -5,6 +5,9 @@
  */
 
 // Load environment variables from .env file
+
+
+
 function loadEnv($path) {
     if (!file_exists($path)) {
         echo "ERROR: .env file not found at: " . htmlspecialchars($path) . "<br>";

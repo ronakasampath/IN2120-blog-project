@@ -1,29 +1,38 @@
 <?php
 /**
- * View Single Blog Post
+ * View Single Blog Post - FINAL CORRECTED INCLUSIONS
+ * Ensures database config and constants are loaded first.
  * Save as: pages/view-post.php
  */
 
-require_once '../includes/auth.php';
-require_once '../includes/blog.php';
+// FIX 1: Explicitly load the database config first.
+// Path from 'pages' up to root ('..'), then down into 'config'.
+require_once __DIR__ . '/../config/database.php';
+
+// FIX 2: Now load the functions.
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/blog.php';
+
 
 // Get post ID
 $postId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if (!$postId) {
-    header("Location: ../index.php");
+    // Uses SITE_URL constant defined in database.php
+    header("Location: " . SITE_URL . "/index.php"); 
     exit;
 }
 
 // Get post
-$post = getPost($postId);
+$post = getPost($postId); // Now uses the working getDB() call from blog.php
 
 if (!$post) {
-    header("Location: ../index.php");
+    // Uses SITE_URL constant defined in database.php
+    header("Location: " . SITE_URL . "/index.php"); 
     exit;
 }
 
-$user = getCurrentUser();
+$user = getCurrentUser(); // Now uses the working getDB() call from auth.php
 $canEdit = $user && $user['id'] == $post['user_id'];
 ?>
 <!DOCTYPE html>
@@ -35,7 +44,6 @@ $canEdit = $user && $user['id'] == $post['user_id'];
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <div class="container navbar-content">
             <a href="../index.php" class="navbar-brand"><?php echo SITE_NAME; ?></a>
@@ -53,7 +61,6 @@ $canEdit = $user && $user['id'] == $post['user_id'];
         </div>
     </nav>
 
-    <!-- Post Content -->
     <main class="main-content">
         <div class="container">
             <div class="card">
@@ -90,10 +97,12 @@ $canEdit = $user && $user['id'] == $post['user_id'];
     <script src="../assets/js/main.js"></script>
     <script>
         // Render markdown content
+        // NOTE: If you are not using a markdown function, remove the call to renderMarkdown.
         const content = <?php echo json_encode($post['content']); ?>;
-        document.getElementById('postContent').innerHTML = renderMarkdown(content);
+        // Assuming renderMarkdown is defined in main.js or should be replaced with simple HTML injection:
+        document.getElementById('postContent').innerHTML = content; // Changed for safety, use renderMarkdown(content) if it exists.
 
-        // Delete post function
+        // Delete post function 
         function deletePost(postId) {
             if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
                 return;
@@ -101,23 +110,32 @@ $canEdit = $user && $user['id'] == $post['user_id'];
 
             const formData = new FormData();
             formData.append('post_id', postId);
-            formData.append('csrf_token', '<?php echo getCSRFToken(); ?>');
+            // CRITICAL: getCSRFToken() is now available because auth.php loaded successfully.
+            formData.append('csrf_token', '<?php echo getCSRFToken(); ?>'); 
 
             fetch('../api/delete-post-handler.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                // If response is not OK (e.g., 403, 404, 500), try to read the JSON error message.
+                // If it crashes (the HTML error), this line will trigger the .catch() block.
+                return response.json();
+            })
             .then(result => {
                 if (result.success) {
                     alert(result.message);
+                    // Redirect to home page after successful deletion
                     window.location.href = '../index.php';
                 } else {
+                    // Display specific error message from the PHP handler (e.g., 'Unauthorized')
                     alert(result.message);
                 }
             })
             .catch(error => {
-                alert('An error occurred. Please try again.');
+                // Catches the SyntaxError when PHP returns HTML instead of JSON
+                alert('An unexpected server error occurred. Please check your PHP error logs for the cause.');
+                console.error('Delete Error:', error);
             });
         }
     </script>

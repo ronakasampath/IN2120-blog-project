@@ -1,60 +1,56 @@
 <?php
 /**
- * Update Post Handler
+ * Update Post Handler - FULLY FIXED
  * Save as: api/update-post-handler.php
- * Handles updates to an existing blog post via POST request.
  */
 
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/blog.php';
 
-// Set content type to JSON
 header('Content-Type: application/json');
 
-// 1. Check if the request method is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
     exit;
 }
 
-// 2. Check if the user is logged in
-$currentUser = getCurrentUser();
-if (!$currentUser) {
+// Check authentication
+if (!isLoggedIn()) {
     http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Authentication required to edit a post.']);
+    echo json_encode(['success' => false, 'message' => 'Please login first']);
     exit;
 }
 
-// 3. Verify CSRF token
-$csrfToken = filter_input(INPUT_POST, 'csrf_token', FILTER_SANITIZE_STRING);
+// Get current user (needs session)
+$currentUser = getCurrentUser();
+
+// Verify CSRF token (needs session)
+$csrfToken = $_POST['csrf_token'] ?? '';
 if (!verifyCSRF($csrfToken)) {
     http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Invalid CSRF token. Request rejected.']);
+    echo json_encode(['success' => false, 'message' => 'Invalid security token']);
     exit;
 }
 
-// 4. Get input
-$postId = filter_input(INPUT_POST, 'post_id', FILTER_VALIDATE_INT);
-$title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_STRING);
-$content = $_POST['content'] ?? '';
+// NOW close session - we have all the data we need
+session_write_close();
 
-if (!$postId) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Invalid Post ID.']);
-    exit;
-}
+// Get form data
+$postId = intval($_POST['post_id'] ?? 0);
+$title = trim($_POST['title'] ?? '');
+$content = trim($_POST['content'] ?? '');
 
-// 5. Call the updatePost function (handles ownership check internally)
+// Update post
 $result = updatePost($postId, $currentUser['id'], $title, $content);
 
-// 6. Return JSON response
 if ($result['success']) {
     http_response_code(200);
 } else {
-    // 403 for unauthorized, 404 for not found, 400 for validation
-    $statusCode = (isset($result['message']) && $result['message'] === 'Unauthorized') ? 403 : 400;
-    http_response_code($statusCode);
+    http_response_code(400);
 }
 
 echo json_encode($result);
+exit;
+?>

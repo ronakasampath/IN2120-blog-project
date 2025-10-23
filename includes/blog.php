@@ -1,16 +1,19 @@
 <?php
 /**
- * Blog Functions - FIXED VERSION
+ * Blog Functions - FINAL CORRECTED VERSION (Using getDB() function)
+ * Ensures correct database access using the provided getDB() function.
  * Save as: includes/blog.php
  */
 
+// FIX: Correct the path to point from 'includes' up to the root, then into 'config'.
 require_once __DIR__ . '/../config/database.php';
+
 
 /**
  * Create blog post
  */
 function createPost($userId, $title, $content) {
-    $db = getDB();
+    $db = getDB(); // FIX: Use getDB() to get connection
     
     if (empty(trim($title))) {
         return ['success' => false, 'message' => 'Title is required'];
@@ -38,7 +41,7 @@ function createPost($userId, $title, $content) {
  * Get all posts
  */
 function getAllPosts() {
-    $db = getDB();
+    $db = getDB(); // FIX: Use getDB() to get connection
     
     try {
         $stmt = $db->query("
@@ -64,7 +67,7 @@ function getAllPosts() {
  * Get single post
  */
 function getPost($postId) {
-    $db = getDB();
+    $db = getDB(); // FIX: Use getDB() to get connection
     
     try {
         $stmt = $db->prepare("
@@ -91,7 +94,7 @@ function getPost($postId) {
  * Get posts by user
  */
 function getPostsByUser($userId) {
-    $db = getDB();
+    $db = getDB(); // FIX: Use getDB() to get connection
     
     try {
         $stmt = $db->prepare("
@@ -118,7 +121,7 @@ function getPostsByUser($userId) {
  * Update post
  */
 function updatePost($postId, $userId, $title, $content) {
-    $db = getDB();
+    $db = getDB(); // FIX: Use getDB() to get connection
     
     if (empty(trim($title))) {
         return ['success' => false, 'message' => 'Title is required'];
@@ -129,7 +132,7 @@ function updatePost($postId, $userId, $title, $content) {
     }
     
     // Check ownership
-    $post = getPost($postId);
+    $post = getPost($postId); 
     if (!$post) {
         return ['success' => false, 'message' => 'Post not found'];
     }
@@ -148,27 +151,35 @@ function updatePost($postId, $userId, $title, $content) {
 }
 
 /**
- * Delete post
+ * Delete post (Corrected signature for handler)
  */
-function deletePost($postId, $userId) {
-    $db = getDB();
-    
-    // Check ownership
-    $post = getPost($postId);
+function deletePost(int $postId, int $userId): array
+{
+    $db = getDB(); // FIX: Use getDB() to get connection
+
+    // 1. Check if the post exists and belongs to the user (Authorization)
+    $post = getPost($postId); 
     if (!$post) {
         return ['success' => false, 'message' => 'Post not found'];
     }
-    
+
     if ($post['user_id'] != $userId) {
         return ['success' => false, 'message' => 'Unauthorized'];
     }
-    
+
+    // 2. Perform the deletion
     try {
-        $stmt = $db->prepare("DELETE FROM blogPost WHERE id = ?");
-        $stmt->execute([$postId]);
-        return ['success' => true, 'message' => 'Post deleted successfully!'];
+        $stmt = $db->prepare("DELETE FROM blogPost WHERE id = :id AND user_id = :user_id");
+        $stmt->execute(['id' => $postId, 'user_id' => $userId]);
+
+        if ($stmt->rowCount() > 0) {
+            return ['success' => true, 'message' => 'Post deleted successfully.'];
+        } else {
+            return ['success' => false, 'message' => 'Failed to delete post (no rows affected).'];
+        }
+
     } catch (PDOException $e) {
-        return ['success' => false, 'message' => 'Failed to delete post'];
+        return ['success' => false, 'message' => 'Database error during deletion.'];
     }
 }
 
@@ -189,4 +200,3 @@ function getExcerpt($content, $length = 150) {
     }
     return $text;
 }
-?>

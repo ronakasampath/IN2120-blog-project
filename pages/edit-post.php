@@ -4,8 +4,9 @@
  * Save as: pages/edit-post.php
  */
 
-require_once '../includes/auth.php';
-require_once '../includes/blog.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/blog.php';
 
 // Require login
 requireLogin();

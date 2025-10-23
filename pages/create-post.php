@@ -54,7 +54,23 @@ include __DIR__ . '/../includes/header.php';
                             Tip: Use # for headings, ** for bold, * for italic, - for lists
                         </small>
                     </div>
+                    <div class="form-group">
+                        <label for="featured_image" class="form-label">Featured Image (Optional)</label>
+                        <input 
+                            type="file" 
+                            id="featured_image" 
+                            name="featured_image" 
+                            class="form-control"
+                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                        <small style="color: var(--text-light); display: block; margin-top: 0.5rem;">
+                            Add a cover image for your post (Max 5MB)
+                        </small>
+                    </div>
 
+                    <!-- Image Preview -->
+                    <div id="imagePreview" style="display: none; margin-top: 1rem;">
+                        <img id="previewImg" style="max-width: 100%; max-height: 300px; border-radius: 6px; border: 2px solid #e5e7eb;">
+                    </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">Publish Post</button>
                         <a href="<?php echo SITE_URL; ?>/index.php" class="btn btn-secondary">Cancel</a>
@@ -109,6 +125,20 @@ include __DIR__ . '/../includes/header.php';
                 messageDiv.innerHTML = '<div class="alert alert-error">An error occurred. Please try again.</div>';
             }
         });
+
+
+        // Preview image
+    document.getElementById('featured_image')?.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
     </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -40,6 +40,7 @@ $currentUser = getCurrentUser();
                 <?php if ($currentUser): ?>
                     <li><a href="<?php echo SITE_URL; ?>/pages/create-post.php">Create Post</a></li>
                     <li><a href="<?php echo SITE_URL; ?>/pages/my-posts.php">My Posts</a></li>
+                    <li><a href="<?php echo SITE_URL; ?>/pages/profile.php">Profile</a></li>
                     <li><a href="<?php echo SITE_URL; ?>/api/logout-handler.php">Logout (<?php echo htmlspecialchars($currentUser['username']); ?>)</a></li>
                 <?php else: ?>
                     <li><a href="<?php echo SITE_URL; ?>/pages/login.php">Login</a></li>

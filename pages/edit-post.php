@@ -91,6 +91,7 @@ if (!$post || $post['user_id'] != $user['id']) {
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">Update Post</button>
                         <a href="view-post.php?id=<?php echo $post['id']; ?>" class="btn btn-secondary">Cancel</a>
+                        <a href="manage-images.php?id=<?php echo $post['id']; ?>" class="btn btn-primary">📸 Manage Images</a>
                     </div>
                 </form>
             </div>

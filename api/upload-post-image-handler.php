@@ -1,72 +1,96 @@
 <?php
 /**
- * API Handler for uploading a featured image to a post.
- * Save as: api/upload-post-image-handler.php
+ * Upload Post Images Handler - WORKING VERSION
+ * Save as: api/upload-post-images-handler.php
  */
+
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 header('Content-Type: application/json');
 
-// Include necessary files
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../includes/auth.php'; // Provides isLoggedIn(), getCurrentUser(), verifyCSRF()
-require_once __DIR__ . '/../includes/blog.php'; // Required for getPost()
-require_once __DIR__ . '/../includes/blog-enhanced.php'; // Required for addPostImage()
+try {
+    require_once __DIR__ . '/../config/database.php';
+    require_once __DIR__ . '/../includes/auth.php';
+    require_once __DIR__ . '/../includes/image-functions.php';
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => 'Failed to load dependencies: ' . $e->getMessage()]);
+    exit;
+}
 
-// Check request method
+// Check method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
     exit;
 }
 
-// Check authentication
+// Check login
 if (!isLoggedIn()) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Authentication required to upload images.']);
-    exit;
-}
-
-// Check CSRF token
-$csrfToken = $_POST['csrf_token'] ?? '';
-if (!verifyCSRF($csrfToken)) {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Invalid security token']);
+    echo json_encode(['success' => false, 'message' => 'Please login first']);
     exit;
 }
 
 $currentUser = getCurrentUser();
+
+// Check CSRF
+$csrfToken = $_POST['csrf_token'] ?? '';
+if (!verifyCSRF($csrfToken)) {
+    echo json_encode(['success' => false, 'message' => 'Invalid security token']);
+    exit;
+}
+
 session_write_close();
 
-// Get POST data and file data
+// Get post ID
 $postId = intval($_POST['post_id'] ?? 0);
-$file = $_FILES['featured_image'] ?? null;
 
-// Validate input
-if (!$postId || !$file || $file['error'] === UPLOAD_ERR_NO_FILE) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Missing post ID or no file selected for upload.']);
+if (!$postId) {
+    echo json_encode(['success' => false, 'message' => 'Invalid post ID']);
     exit;
 }
 
-// Check authorization (Must be the post author or an admin)
-$post = getPost($postId);
-if (!$post || ($post['user_id'] != $currentUser['id'] && !isAdmin())) {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Post not found or unauthorized to edit its image.']);
+// Verify ownership
+try {
+    $db = getDB();
+    $stmt = $db->prepare("SELECT user_id FROM blogPost WHERE id = ?");
+    $stmt->execute([$postId]);
+    $post = $stmt->fetch();
+    
+    if (!$post) {
+        echo json_encode(['success' => false, 'message' => 'Post not found']);
+        exit;
+    }
+    
+    if ($post['user_id'] != $currentUser['id'] && !isAdmin()) {
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        exit;
+    }
+} catch (PDOException $e) {
+    echo json_encode(['success' => false, 'message' => 'Database error']);
     exit;
 }
 
-// Call the image upload function defined in blog-enhanced.php
-$result = addPostImage($postId, $file);
-
-if ($result['success']) {
-    http_response_code(200);
-} else {
-    // Determine appropriate error code
-    $errorCode = (strpos($result['message'], 'size') !== false || strpos($result['message'], 'type') !== false) ? 400 : 500;
-    http_response_code($errorCode);
+// Check files
+if (!isset($_FILES['images']) || empty($_FILES['images']['tmp_name'][0])) {
+    echo json_encode(['success' => false, 'message' => 'No images uploaded']);
+    exit;
 }
 
-echo json_encode($result);
+// Upload images
+try {
+    $result = uploadPostImages($postId, $_FILES['images']);
+    
+    if ($result['success']) {
+        http_response_code(200);
+    } else {
+        http_response_code(400);
+    }
+    
+    echo json_encode($result);
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => 'Upload error: ' . $e->getMessage()]);
+}
+
 exit;
 ?>

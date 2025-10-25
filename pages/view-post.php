@@ -59,6 +59,22 @@ include __DIR__ . '/../includes/header.php';
                 </div>
             <?php endif; ?>
         </div>
+        <!-- Post Images -->
+        <?php 
+        require_once __DIR__ . '/../includes/image-functions.php';
+        $postImages = getPostImages($postId);
+        if (!empty($postImages)): 
+        ?>
+            <div class="card">
+                <div style="display: grid; gap: 1rem;">
+                    <?php foreach ($postImages as $image): ?>
+                        <img src="<?php echo SITE_URL . htmlspecialchars($image['image_path']); ?>" 
+                            alt="Post image" 
+                            style="width: 100%; max-height: 500px; object-fit: cover; border-radius: 8px;">
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <!-- Featured Image -->
         <?php if (!empty($post['featured_image'])): ?>
@@ -102,20 +118,11 @@ include __DIR__ . '/../includes/header.php';
 
             <!-- Add Comment Form -->
             <?php if ($currentUser): ?>
-                <form id="commentForm" class="comment-form">
+                <form id="commentForm" style="margin: 1rem 0;" onsubmit="return false;">
                     <input type="hidden" name="csrf_token" value="<?php echo getCSRFToken(); ?>">
-                    <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                    
-                    <div class="form-group">
-                        <textarea 
-                            name="comment_text" 
-                            class="form-control" 
-                            rows="3" 
-                            placeholder="Write a comment..." 
-                            required></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                    <input type="hidden" name="post_id" value="<?php echo $postId; ?>">
+                    <textarea id="commentTextarea" name="comment_text" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px;" rows="3" placeholder="Write a comment..." required></textarea>
+                    <button type="button" onclick="postComment()" class="btn btn-primary" style="margin-top: 0.5rem;">Post Comment</button>
                 </form>
             <?php else: ?>
                 <p><a href="<?php echo SITE_URL; ?>/pages/login.php">Login</a> to comment</p>
@@ -130,7 +137,7 @@ include __DIR__ . '/../includes/header.php';
                         <div class="comment-item" id="comment-<?php echo $comment['id']; ?>">
                             <div class="comment-avatar">
                                 <?php if ($comment['profile_picture']): ?>
-                                    <img src="<?php echo SITE_URL . htmlspecialchars($comment['profile_picture']); ?>" alt="Profile" class="profile-pic">
+                                    <img src="<?php echo SITE_URL . htmlspecialchars($comment['profile_picture']); ?>" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
                                 <?php else: ?>
                                     <div class="profile-pic" style="background: #e5e7eb; display: flex; align-items: center; justify-content: center;">
                                         👤
@@ -327,6 +334,50 @@ include __DIR__ . '/../includes/header.php';
             }
         });
     }
+
+    // Post comment function
+function postComment() {
+    const commentText = document.getElementById('commentTextarea').value.trim();
+    
+    if (!commentText) {
+        alert('Please write a comment');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('post_id', <?php echo $postId; ?>);
+    formData.append('comment_text', commentText);
+    formData.append('csrf_token', '<?php echo getCSRFToken(); ?>');
+    
+    console.log('Posting comment...'); // DEBUG
+    
+    fetch('<?php echo SITE_URL; ?>/api/add-comment-handler.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        
+        if (data.success) {
+            alert('✅ Comment posted!');
+            location.reload();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Error posting comment');
+    });
+}
+
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+
+
+

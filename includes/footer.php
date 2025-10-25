@@ -1,13 +1,16 @@
 <?php
 /**
- * Common Footer for All Pages
+ * Footer Template - Professional Design
  * Save as: includes/footer.php
  */
 ?>
-    <!-- Footer -->
+
     <footer class="footer">
-        <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All rights reserved.</p>
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <p>&copy; <?php echo date('Y'); ?> Professional Blog. All rights reserved.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+                Built with <i class="fas fa-heart" style="color: var(--danger-color);"></i> using PHP and modern web technologies
+            </p>
         </div>
     </footer>
 

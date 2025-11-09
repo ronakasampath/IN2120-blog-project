@@ -1,6 +1,6 @@
 <?php
 /**
- * Homepage - WITH FOLLOW SYSTEM
+ * Homepage - ULTRA PROFESSIONAL PUBLICATION DESIGN
  * Save as: index.php
  */
 
@@ -23,10 +23,8 @@ $showFollowing = isset($_GET['following']) && $_GET['following'] === '1';
 $db = getDB();
 
 if ($showFollowing && $currentUser) {
-    // Get posts from followed users only
     $posts = getFollowingPosts($currentUser['id'], $category, $searchQuery);
 } else {
-    // Get all posts
     $sql = "SELECT 
                 bp.id, 
                 bp.title, 
@@ -36,7 +34,7 @@ if ($showFollowing && $currentUser) {
                 bp.updated_at,
                 u.username,
                 u.id as user_id
-            FROM blogPost bp
+            FROM blogpost bp
             JOIN user u ON bp.user_id = u.id
             WHERE 1=1";
 
@@ -63,7 +61,7 @@ if ($showFollowing && $currentUser) {
 }
 
 // Get all categories for filter
-$categoriesStmt = $db->query("SELECT DISTINCT category FROM blogPost WHERE category IS NOT NULL AND category != '' ORDER BY category");
+$categoriesStmt = $db->query("SELECT DISTINCT category FROM blogpost WHERE category IS NOT NULL AND category != '' ORDER BY category");
 $categories = $categoriesStmt->fetchAll(PDO::FETCH_COLUMN);
 
 include __DIR__ . '/includes/header.php';
@@ -74,7 +72,7 @@ include __DIR__ . '/includes/header.php';
 .feed-toggle {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     padding: 0.5rem;
     margin-bottom: 2rem;
     display: flex;
@@ -99,31 +97,78 @@ include __DIR__ . '/includes/header.php';
 }
 
 .feed-tab.active {
-    background: #4f46e5;
+    background: #111827;
     color: white;
-    border-color: #4f46e5;
+    border-color: #111827;
+}
+
+/* Category Filter - Horizontal Scroll */
+.category-filter-wrapper {
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.category-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+}
+
+.category-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.category-filter {
+    display: inline-flex;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    white-space: nowrap;
+}
+
+.category-btn {
+    padding: 0.5rem 1.125rem;
+    border: none;
+    background: transparent;
+    border-radius: 20px;
+    text-decoration: none;
+    color: #6b7280;
+    font-weight: 500;
+    transition: all 0.2s;
+    font-size: 0.9375rem;
+}
+
+.category-btn:hover {
+    color: #111827;
+    background: #f3f4f6;
+}
+
+.category-btn.active {
+    background: #111827;
+    color: white;
 }
 
 /* Blog Card Layout */
 .blog-card {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     margin-bottom: 2rem;
     overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .blog-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .blog-card-content {
     display: grid;
     grid-template-columns: 1fr 300px;
-    gap: 1.5rem;
-    padding: 1.5rem;
+    gap: 2rem;
+    padding: 2rem;
 }
 
 .blog-card-left {
@@ -134,13 +179,13 @@ include __DIR__ . '/includes/header.php';
 .blog-card-author {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
+    gap: 0.875rem;
+    margin-bottom: 1.25rem;
 }
 
 .blog-card-author img {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #e5e7eb;
@@ -148,16 +193,16 @@ include __DIR__ . '/includes/header.php';
 }
 
 .blog-card-author .default-avatar {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-weight: 600;
-    font-size: 1.2rem;
+    font-weight: 700;
+    font-size: 1.25rem;
     cursor: pointer;
 }
 
@@ -168,46 +213,48 @@ include __DIR__ . '/includes/header.php';
 .blog-card-author-name {
     font-weight: 600;
     color: #1f2937;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .blog-card-author-name:hover {
-    color: #4f46e5;
+    color: #1a232fff;
 }
 
 .blog-card-date {
-    font-size: 0.8rem;
-    color: #6b7280;
+    font-size: 0.8125rem;
+    color: #9ca3af;
 }
 
-.follow-btn-small {
-    padding: 0.25rem 0.75rem;
-    border: 1px solid #4f46e5;
-    background: #4f46e5;
-    color: white;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 600;
+/* Follow Button - Dot Style */
+.follow-dot-btn-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    background: none;
+    border: none;
+    color: #1a232fff;
+    font-weight: 500;
+    font-size: 0.875rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: opacity 0.2s;
 }
 
-.follow-btn-small:hover {
-    background: #4338ca;
-    border-color: #4338ca;
+.follow-dot-btn-card:hover {
+    opacity: 0.75;
 }
 
-.follow-btn-small.following {
-    background: white;
-    color: #4f46e5;
+.follow-dot-btn-card.following {
+    color: #111827;
 }
 
-.follow-btn-small.following:hover {
-    background: #fee2e2;
-    border-color: #ef4444;
-    color: #ef4444;
+.follow-dot-card {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
 }
 
 .blog-card-title-row {
@@ -215,13 +262,13 @@ include __DIR__ . '/includes/header.php';
     justify-content: space-between;
     align-items: start;
     gap: 1rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 .blog-card-title {
-    font-size: 1.5rem;
+    font-size: 1.625rem;
     font-weight: 700;
-    color: #1f2937;
+    color: #1a232fff;
     line-height: 1.3;
     flex: 1;
 }
@@ -233,7 +280,21 @@ include __DIR__ . '/includes/header.php';
 }
 
 .blog-card-title a:hover {
-    color: #4f46e5;
+    color: #1a232fff;
+}
+
+/* Category Badge - More Subtle */
+.category-badge-subtle {
+    padding: 0.375rem 0.875rem;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    opacity: 0.7;
+    background: #f3f4f6;
+    color: #6b7280;
 }
 
 .blog-card-excerpt {
@@ -242,7 +303,7 @@ include __DIR__ . '/includes/header.php';
     margin-bottom: 1rem;
     flex: 1;
     display: -webkit-box;
-    -webkit-line-clamp: 8;
+    -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -255,14 +316,14 @@ include __DIR__ . '/includes/header.php';
 
 .blog-card-image {
     width: 100%;
-    height: 200px;
+    height: 220px;
     border-radius: 8px;
     object-fit: cover;
     background: #f3f4f6;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #9ca3af;
+    color: #d1d5db;
 }
 
 .blog-card-image img {
@@ -276,22 +337,22 @@ include __DIR__ . '/includes/header.php';
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    padding-top: 0.75rem;
+    padding-top: 1rem;
     border-top: 1px solid #e5e7eb;
 }
 
 .blog-card-action {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
     color: #6b7280;
-    font-size: 0.9rem;
+    font-size: 0.9375rem;
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .blog-card-action:hover {
-    color: #4f46e5;
+    color: #111827;
 }
 
 .blog-card-footer {
@@ -301,93 +362,27 @@ include __DIR__ . '/includes/header.php';
 }
 
 .read-more {
-    color: #4f46e5;
+    color: #3b82f6;
     font-weight: 600;
     text-decoration: none;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     transition: color 0.2s;
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
     display: inline-block;
 }
 
 .read-more:hover {
-    color: #4338ca;
+    color: #2563eb;
     text-decoration: underline;
 }
-
-.filter-section {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.filter-label {
-    display: block;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-}
-
-.category-filter {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-.category-btn {
-    padding: 0.5rem 1rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #6b7280;
-    font-weight: 600;
-    transition: all 0.2s;
-    font-size: 0.9rem;
-}
-
-.category-btn:hover {
-    border-color: #4f46e5;
-    color: #4f46e5;
-    background: #f0f4ff;
-}
-
-.category-btn.active {
-    background: #4f46e5;
-    color: white;
-    border-color: #4f46e5;
-}
-
-.category-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.category-badge.technology { background: #dbeafe; color: #1e40af; }
-.category-badge.science { background: #d1fae5; color: #065f46; }
-.category-badge.art { background: #fce7f3; color: #9f1239; }
-.category-badge.ai { background: #e0e7ff; color: #3730a3; }
-.category-badge.business { background: #fef3c7; color: #92400e; }
-.category-badge.lifestyle { background: #fee2e2; color: #991b1b; }
-.category-badge.education { background: #f3e8ff; color: #6b21a8; }
-.category-badge.health { background: #d1fae5; color: #065f46; }
-.category-badge.travel { background: #dbeafe; color: #1e40af; }
-.category-badge.food { background: #fed7aa; color: #9a3412; }
-.category-badge.other { background: #f3f4f6; color: #374151; }
 
 /* Empty state for no following */
 .empty-following {
     background: white;
     border-radius: 12px;
-    padding: 3rem;
+    padding: 3.5rem;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 .empty-following-icon {
@@ -395,19 +390,140 @@ include __DIR__ . '/includes/header.php';
     margin-bottom: 1.5rem;
 }
 
+/* Add this CSS to your <style> section in index.php, right after the existing styles */
+
+/* ============================================
+   BUTTON STYLES - Theme Matched
+   ============================================ */
+
+/* Base button styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+    line-height: 1.2;
+    font-family: inherit;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Small button variant */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    border-radius: 6px;
+}
+
+/* Success button (Edit) - Emerald Green */
+.btn-success {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+    box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
+}
+
+.btn-success:hover:not(:disabled) {
+    background: #059669;
+    border-color: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+/* Danger button (Delete) - Red */
+.btn-danger {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    box-shadow: 0 1px 2px rgba(239, 68, 68, 0.1);
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+/* Primary button (Dark) */
+.btn-primary {
+    background: #111827;
+    color: white;
+    border-color: #111827;
+    box-shadow: 0 1px 2px rgba(17, 24, 39, 0.1);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #1f2937;
+    border-color: #1f2937;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(17, 24, 39, 0.3);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(17, 24, 39, 0.2);
+}
+
+/* Secondary button (Light Gray) */
+.btn-secondary {
+    background: #f3f4f6;
+    color: #1f2937;
+    border-color: #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive design for buttons */
 @media (max-width: 768px) {
-    .blog-card-content {
-        grid-template-columns: 1fr;
+    .btn-sm {
+        padding: 0.4rem 0.875rem;
+        font-size: 0.75rem;
     }
     
-    .blog-card-image {
-        height: 180px;
+    .blog-card-footer > div:last-child {
+        width: 100%;
+        justify-content: stretch;
     }
     
-    .feed-toggle {
-        flex-direction: column;
+    .blog-card-footer > div:last-child .btn {
+        flex: 1;
     }
 }
+
+
+
 </style>
 
 <main class="main-content">
@@ -441,21 +557,22 @@ include __DIR__ . '/includes/header.php';
         </div>
         <?php endif; ?>
 
-        <!-- Category Filter -->
+        <!-- Category Filter - Horizontal Scroll -->
         <?php if (!empty($categories) && !$showFollowing): ?>
-        <div class="filter-section">
-            <span class="filter-label">Filter by Category:</span>
-            <div class="category-filter">
-                <a href="<?php echo SITE_URL; ?>/index.php" 
-                   class="category-btn <?php echo empty($category) ? 'active' : ''; ?>">
-                    All
-                </a>
-                <?php foreach ($categories as $cat): ?>
-                    <a href="<?php echo SITE_URL; ?>/index.php?category=<?php echo urlencode($cat); ?>" 
-                       class="category-btn <?php echo $category === $cat ? 'active' : ''; ?>">
-                        <?php echo htmlspecialchars(ucfirst($cat)); ?>
+        <div class="category-filter-wrapper">
+            <div class="category-scroll-container">
+                <div class="category-filter">
+                    <a href="<?php echo SITE_URL; ?>/index.php" 
+                       class="category-btn <?php echo empty($category) ? 'active' : ''; ?>">
+                        All
                     </a>
-                <?php endforeach; ?>
+                    <?php foreach ($categories as $cat): ?>
+                        <a href="<?php echo SITE_URL; ?>/index.php?category=<?php echo urlencode($cat); ?>" 
+                           class="category-btn <?php echo $category === $cat ? 'active' : ''; ?>">
+                            <?php echo htmlspecialchars(ucfirst($cat)); ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
         <?php endif; ?>
@@ -463,7 +580,7 @@ include __DIR__ . '/includes/header.php';
         <?php if ($searchQuery): ?>
             <div class="card">
                 <p>Search results for: <strong><?php echo htmlspecialchars($searchQuery); ?></strong></p>
-                <a href="<?php echo SITE_URL; ?>/index.php" style="color: #4f46e5; font-weight: 600;">Clear search</a>
+                <a href="<?php echo SITE_URL; ?>/index.php" style="color: #3b82f6; font-weight: 600;">Clear search</a>
             </div>
         <?php endif; ?>
 
@@ -530,10 +647,11 @@ include __DIR__ . '/includes/header.php';
                                 </div>
                                 
                                 <?php if ($currentUser && $currentUser['id'] != $post['user_id']): ?>
-                                    <button class="follow-btn-small <?php echo $isFollowingAuthor ? 'following' : ''; ?>" 
+                                    <button class="follow-dot-btn-card <?php echo $isFollowingAuthor ? 'following' : ''; ?>" 
                                             data-user-id="<?php echo $post['user_id']; ?>"
                                             onclick="toggleFollowFromCard(this, <?php echo $post['user_id']; ?>)">
-                                        <?php echo $isFollowingAuthor ? 'Following' : 'Follow'; ?>
+                                        <span class="follow-dot-card"></span>
+                                        <span><?php echo $isFollowingAuthor ? 'Following' : 'Follow'; ?></span>
                                     </button>
                                 <?php endif; ?>
                             </div>
@@ -545,7 +663,7 @@ include __DIR__ . '/includes/header.php';
                                     </a>
                                 </h2>
                                 <?php if ($post['category']): ?>
-                                    <span class="category-badge <?php echo htmlspecialchars($post['category']); ?>">
+                                    <span class="category-badge-subtle">
                                         <?php echo htmlspecialchars($post['category']); ?>
                                     </span>
                                 <?php endif; ?>
@@ -561,7 +679,7 @@ include __DIR__ . '/includes/header.php';
                             <div class="blog-card-footer">
                                 <div class="blog-card-actions">
                                     <span class="blog-card-action">
-                                        ❤️ <span><?php echo $likeCount; ?></span>
+                                        <span class="like-count"><?php echo $likeCount; ?></span>
                                     </span>
                                     <span class="blog-card-action">
                                         💬 <span><?php echo $commentCount; ?></span>
@@ -604,172 +722,127 @@ include __DIR__ . '/includes/header.php';
 </main>
 
 <script>
-
 function toggleFollowFromCard(button, userId) {
     <?php if (!$currentUser): ?>
         alert('Please login to follow users');
         return;
     <?php endif; ?>
     
-    console.log('=== FOLLOW BUTTON CLICKED ===');
-    console.log('User ID:', userId);
-    console.log('Current user:', <?php echo json_encode($currentUser ?? null); ?>);
-    console.log('CSRF Token:', '<?php echo getCSRFToken(); ?>');
-    
-    const originalText = button.textContent;
+    const originalText = button.querySelector('span:last-child').textContent;
     button.disabled = true;
-    button.textContent = 'Loading...';
+    button.querySelector('span:last-child').textContent = '...';
     
     const formData = new FormData();
     formData.append('user_id', userId);
     formData.append('csrf_token', '<?php echo getCSRFToken(); ?>');
     
-    console.log('FormData contents:');
-    for (let pair of formData.entries()) {
-        console.log(pair[0] + ':', pair[1]);
-    }
-    
     fetch('<?php echo SITE_URL; ?>/api/toggle-follow-handler.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        
-        // Try to get the response text first
-        return response.text().then(text => {
-            console.log('Raw response text:', text);
-            
-            // Try to parse as JSON
-            try {
-                const json = JSON.parse(text);
-                console.log('Parsed JSON:', json);
-                return {
-                    ok: response.ok,
-                    status: response.status,
-                    data: json
-                };
-            } catch (e) {
-                console.error('JSON parse error:', e);
-                console.error('Response was not valid JSON:', text.substring(0, 500));
-                return {
-                    ok: false,
-                    status: response.status,
-                    data: { 
-                        success: false, 
-                        message: 'Server returned invalid response',
-                        raw: text.substring(0, 200)
-                    }
-                };
-            }
-        });
-    })
-    .then(({ ok, status, data }) => {
-        console.log('Final result:', data);
-        
-        if (data.success) {
-            if (data.following) {
-                button.classList.add('following');
-                button.textContent = 'Following';
-                showToast('✓ Now following!');
+    .then(response => response.text())
+    .then(text => {
+        try {
+            const data = JSON.parse(text);
+            if (data.success) {
+                if (data.following) {
+                    button.classList.add('following');
+                    button.querySelector('span:last-child').textContent = 'Following';
+                    showToast('✓ Now following!');
+                } else {
+                    button.classList.remove('following');
+                    button.querySelector('span:last-child').textContent = 'Follow';
+                    showToast('Unfollowed');
+                }
             } else {
-                button.classList.remove('following');
-                button.textContent = 'Follow';
-                showToast('Unfollowed');
+                alert(data.message || 'Failed to update follow status');
+                button.querySelector('span:last-child').textContent = originalText;
             }
-        } else {
-            console.error('Follow action failed:', data);
-            
-            // Show detailed error
-            let errorMsg = data.message || 'Unknown error';
-            
-            if (data.error === 'followers_table_missing') {
-                errorMsg = '❌ Database not set up!\n\nThe followers table is missing.\nPlease run the database migration SQL.';
-            }
-            
-            alert(errorMsg);
-            button.textContent = originalText;
+            button.disabled = false;
+        } catch (e) {
+            console.error('JSON parse error:', e);
+            alert('Server error. Please try again.');
+            button.querySelector('span:last-child').textContent = originalText;
+            button.disabled = false;
         }
-        button.disabled = false;
     })
     .catch(error => {
         console.error('Network error:', error);
-        alert('❌ Network error: ' + error.message + '\n\nCheck browser console for details.');
-        button.textContent = originalText;
+        alert('Network error. Please try again.');
+        button.querySelector('span:last-child').textContent = originalText;
         button.disabled = false;
     });
 }
 
-    function copyPostUrl(postId) {
-        const url = '<?php echo SITE_URL; ?>/pages/view-post.php?id=' + postId;
-        navigator.clipboard.writeText(url).then(() => {
-            showToast('Link copied to clipboard!');
-        }).catch(() => {
-            alert('Link: ' + url);
-        });
-    }
+function copyPostUrl(postId) {
+    const url = '<?php echo SITE_URL; ?>/pages/view-post.php?id=' + postId;
+    navigator.clipboard.writeText(url).then(() => {
+        showToast('Link copied to clipboard!');
+    }).catch(() => {
+        alert('Link: ' + url);
+    });
+}
 
 function showToast(message) {
     const toast = document.createElement('div');
-    toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; font-weight: 600;';
+    toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #111827; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; font-weight: 600;';
     toast.textContent = message;
     document.body.appendChild(toast);
     
     setTimeout(() => toast.remove(), 3000);
 }
 
-    function deletePostFromHome(postId) {
-        if (!confirm('Delete this post permanently?')) return;
+function deletePostFromHome(postId) {
+    if (!confirm('Delete this post permanently?')) return;
 
-        const formData = new FormData();
-        formData.append('post_id', postId);
-        formData.append('csrf_token', '<?php echo getCSRFToken(); ?>');
+    const formData = new FormData();
+    formData.append('post_id', postId);
+    formData.append('csrf_token', '<?php echo getCSRFToken(); ?>');
 
-        fetch('<?php echo SITE_URL; ?>/api/delete-post-handler.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                showToast(result.message);
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                alert(result.message);
-            }
-        })
-        .catch(error => alert('Error occurred'));
-    }
+    fetch('<?php echo SITE_URL; ?>/api/delete-post-handler.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            showToast(result.message);
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            alert(result.message);
+        }
+    })
+    .catch(error => alert('Error occurred'));
+}
 
-    // Render excerpts
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.blog-excerpt-rendered').forEach(excerptDiv => {
-            const fullContent = excerptDiv.dataset.fullContent;
-            if (!fullContent) {
-                excerptDiv.textContent = 'No content available';
-                return;
+// Render excerpts
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.blog-excerpt-rendered').forEach(excerptDiv => {
+        const fullContent = excerptDiv.dataset.fullContent;
+        if (!fullContent) {
+            excerptDiv.textContent = 'No content available';
+            return;
+        }
+        
+        try {
+            const rendered = renderMarkdown(fullContent);
+            const temp = document.createElement('div');
+            temp.innerHTML = rendered;
+            
+            let plainText = temp.textContent || temp.innerText || '';
+            plainText = plainText.trim();
+            
+            if (plainText.length > 350) {
+                plainText = plainText.substring(0, 350) + '...';
             }
             
-            try {
-                const rendered = renderMarkdown(fullContent);
-                const temp = document.createElement('div');
-                temp.innerHTML = rendered;
-                
-                let plainText = temp.textContent || temp.innerText || '';
-                plainText = plainText.trim();
-                
-                if (plainText.length > 400) {
-                    plainText = plainText.substring(0, 400) + '...';
-                }
-                
-                excerptDiv.textContent = plainText || 'No content available';
-            } catch (error) {
-                console.error('Error rendering excerpt:', error);
-                excerptDiv.textContent = fullContent.substring(0, 400) + '...';
-            }
-        });
+            excerptDiv.textContent = plainText || 'No content available';
+        } catch (error) {
+            console.error('Error rendering excerpt:', error);
+            excerptDiv.textContent = fullContent.substring(0, 350) + '...';
+        }
     });
+});
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

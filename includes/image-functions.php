@@ -130,7 +130,7 @@ function deletePostImage($imageId, $userId) {
         $stmt = $db->prepare("
             SELECT pi.image_path, bp.user_id 
             FROM post_images pi 
-            JOIN blogPost bp ON pi.post_id = bp.id 
+            JOIN blogpost bp ON pi.post_id = bp.id 
             WHERE pi.id = ?
         ");
         $stmt->execute([$imageId]);

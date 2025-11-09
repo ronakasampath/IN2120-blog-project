@@ -1,13 +1,10 @@
 <?php
 /**
- * Authentication Functions - COMPLETE WITH ADMIN
+ * FIXED includes/auth.php
  * Save as: includes/auth.php
  */
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+// Session is already started in database.php, so don't start it again
 require_once __DIR__ . '/../config/database.php';
 
 /**
@@ -17,7 +14,6 @@ function registerUser($username, $email, $password) {
     $db = getDB();
     $errors = [];
     
-    // Validate
     if (strlen($username) < 3) {
         $errors[] = "Username must be at least 3 characters";
     }
@@ -32,7 +28,6 @@ function registerUser($username, $email, $password) {
         return ['success' => false, 'message' => implode(', ', $errors)];
     }
     
-    // Check if exists
     try {
         $stmt = $db->prepare("SELECT id FROM user WHERE username = ? OR email = ?");
         $stmt->execute([$username, $email]);
@@ -41,7 +36,6 @@ function registerUser($username, $email, $password) {
             return ['success' => false, 'message' => 'Username or email already exists'];
         }
         
-        // Insert user
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT, ['cost' => HASH_COST]);
         $stmt = $db->prepare("INSERT INTO user (username, email, password, role) VALUES (?, ?, ?, 'user')");
         $stmt->execute([$username, $email, $hashedPassword]);
@@ -67,7 +61,6 @@ function loginUser($username, $password) {
             return ['success' => false, 'message' => 'Invalid credentials'];
         }
         
-        // Set session
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
@@ -157,9 +150,15 @@ function getCSRFToken() {
 }
 
 /**
- * Verify CSRF token
+ * Verify CSRF token - FIXED FUNCTION NAME
  */
-function verifyCSRF($token) {
+function verifyCSRFToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
-?>
+
+/**
+ * Alias for backward compatibility
+ */
+function verifyCSRF($token) {
+    return verifyCSRFToken($token);
+}

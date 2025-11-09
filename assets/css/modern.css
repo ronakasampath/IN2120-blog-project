@@ -1,0 +1,446 @@
+/* Modern Minimalist Theme */
+:root {
+    /* Grayscale */
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* Gradients */
+    --gradient-blue: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    --gradient-green: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    --gradient-red: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    --gradient-gray: linear-gradient(135deg, var(--gray-700) 0%, var(--gray-800) 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    
+    /* Transitions */
+    --transition-all: all 0.2s ease-in-out;
+}
+
+/* Core Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    line-height: 1.6;
+}
+
+/* Modern Card Design */
+.modern-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    transition: var(--transition-all);
+    border: 1px solid var(--gray-200);
+}
+
+.modern-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Form Elements */
+.modern-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    background: white;
+    color: var(--gray-800);
+    font-size: 1rem;
+    transition: var(--transition-all);
+}
+
+.modern-input:focus {
+    outline: none;
+    border-color: var(--gray-400);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.modern-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+/* Buttons */
+.modern-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    min-width: 120px;
+    height: 40px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    background: white;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Button sizes */
+.modern-btn.btn-sm {
+    padding: 0.5rem 1rem;
+    height: 32px;
+    min-width: 100px;
+    font-size: 0.875rem;
+}
+
+.modern-btn.btn-lg {
+    padding: 1rem 1.5rem;
+    height: 48px;
+    min-width: 140px;
+    font-size: 1rem;
+}
+
+/* Button group */
+.btn-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.btn-group.btn-group-vertical {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* Equal width buttons in groups */
+.btn-group.btn-group-equal .modern-btn {
+    flex: 1;
+}
+
+.modern-btn-primary {
+    background: var(--gray-900);
+    border-color: var(--gray-900);
+    color: white;
+}
+
+.modern-btn-success {
+    background: white;
+    border-color: var(--gray-300);
+    color: var(--gray-700);
+}
+
+.modern-btn-danger {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--gray-600);
+}
+
+.modern-btn-gray {
+    background: var(--gray-50);
+    border-color: var(--gray-200);
+    color: var(--gray-600);
+}
+
+.modern-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
+    color: var(--gray-800);
+}
+
+.modern-btn-primary:hover {
+    background: var(--gray-800);
+    border-color: var(--gray-800);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modern-btn-success:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+    color: var(--gray-800);
+}
+
+.modern-btn-danger:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
+    color: var(--gray-700);
+}
+
+.modern-btn-gray:hover {
+    background: white;
+    border-color: var(--gray-300);
+    color: var(--gray-700);
+}
+
+/* Active states */
+.modern-btn:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+/* Disabled state */
+.modern-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    background: var(--gray-50);
+    border-color: var(--gray-200);
+    color: var(--gray-400);
+}
+
+/* Button with icon */
+.modern-btn .icon {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+    stroke: currentColor;
+}
+
+/* Icons */
+.icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+    stroke: currentColor;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Upload Area */
+.modern-upload {
+    border: 2px dashed var(--gray-300);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: var(--gray-50);
+    transition: var(--transition-all);
+    cursor: pointer;
+}
+
+.modern-upload:hover {
+    border-color: var(--gray-400);
+    background: white;
+}
+
+.modern-upload.dragover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.upload-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    color: var(--gray-400);
+}
+
+/* Preview Area */
+.preview-section {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+}
+
+.preview-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--gray-100);
+    margin-bottom: 1.5rem;
+}
+
+.preview-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--gray-600);
+}
+
+.preview-empty {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--gray-50);
+    border-radius: 8px;
+    color: var(--gray-500);
+}
+
+.preview-empty-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    color: var(--gray-400);
+}
+
+/* Image Preview Grid */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.image-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid var(--gray-200);
+}
+
+.image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-image {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--gradient-red);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-all);
+}
+
+.remove-image:hover {
+    transform: scale(1.1);
+}
+
+/* Toast Notifications */
+.modern-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--gradient-gray);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.toast-success {
+    background: var(--gradient-green);
+}
+
+.toast-error {
+    background: var(--gradient-red);
+}
+
+/* Loading States */
+.modern-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--gray-600);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Alignment utilities */
+.align-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.align-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.align-end {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Button container */
+.btn-container {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.btn-container.center {
+    justify-content: center;
+}
+
+.btn-container.end {
+    justify-content: flex-end;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modern-card {
+        padding: 1.5rem;
+    }
+    
+    .btn-container {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .modern-btn {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .modern-btn {
+        width: 100%;
+    }
+    
+    .image-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    
+    /* Allow horizontal button groups on mobile with special class */
+    .btn-group.keep-horizontal {
+        flex-direction: row;
+    }
+    
+    .btn-group.keep-horizontal .modern-btn {
+        width: auto;
+    }
+}

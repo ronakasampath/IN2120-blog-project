@@ -146,7 +146,7 @@ function getFollowingPosts($userId, $category = '', $searchQuery = '') {
                 bp.updated_at,
                 u.username,
                 u.id as user_id
-            FROM blogPost bp
+            FROM blogpost bp
             JOIN user u ON bp.user_id = u.id
             WHERE bp.user_id IN ($placeholders)";
     

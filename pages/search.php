@@ -34,7 +34,7 @@ if ($searchQuery) {
                 bp.updated_at,
                 u.username,
                 u.id as user_id
-            FROM blogPost bp
+            FROM blogpost bp
             JOIN user u ON bp.user_id = u.id
             WHERE bp.title LIKE ? 
                OR bp.content LIKE ?
@@ -55,7 +55,7 @@ if ($searchQuery) {
                 u.created_at,
                 COUNT(DISTINCT bp.id) as post_count
             FROM user u
-            LEFT JOIN blogPost bp ON u.id = bp.user_id
+            LEFT JOIN blogpost bp ON u.id = bp.user_id
             WHERE u.username LIKE ?
             GROUP BY u.id
             ORDER BY post_count DESC, u.username ASC";
@@ -68,7 +68,7 @@ if ($searchQuery) {
     $sql = "SELECT 
                 bp.category,
                 COUNT(*) as post_count
-            FROM blogPost bp
+            FROM blogpost bp
             WHERE bp.category LIKE ?
             AND bp.category IS NOT NULL 
             AND bp.category != ''
@@ -87,23 +87,30 @@ include __DIR__ . '/../includes/header.php';
 
 <style>
 /* Search Header */
+/* Search Header */
+/* ============================================
+   SEARCH PAGE STYLES - FIXED VERSION
+   Add this to your search.php <style> section
+   ============================================ */
+
+/* Search Header */
 .search-header {
-    background: white;
+    background: #ffffff;
     border-radius: 12px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .search-title {
     font-size: 2rem;
     font-weight: 700;
-    color: #1f2937;
+    color: #111827;
     margin-bottom: 0.5rem;
 }
 
 .search-query {
-    color: #4f46e5;
+    color: #3b82f6;
     font-weight: 600;
 }
 
@@ -119,21 +126,22 @@ include __DIR__ . '/../includes/header.php';
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    color: #6b7280;
 }
 
 .search-stat-number {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #4f46e5;
+    color: #111827;
 }
 
-/* Tab Navigation */
+/* Search Tabs - FIXED */
 .search-tabs {
-    background: white;
+    background: #ffffff;
     border-radius: 12px;
     padding: 0.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     gap: 0.5rem;
 }
@@ -152,43 +160,75 @@ include __DIR__ . '/../includes/header.php';
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    background: transparent;
 }
 
 .search-tab:hover {
     background: #f3f4f6;
-    color: #1f2937;
+    color: #111827;
 }
 
 .search-tab.active {
-    background: #4f46e5;
-    color: white;
-    border-color: #4f46e5;
+    background: #111827;
+    color: #ffffff !important;
+    border-color: #111827;
 }
 
 .tab-count {
-    background: rgba(255,255,255,0.2);
+    background: rgba(107, 114, 128, 0.2);
     padding: 0.2rem 0.6rem;
     border-radius: 6px;
     font-size: 0.875rem;
+    color: inherit;
 }
 
 .search-tab.active .tab-count {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+/* Blog Card for Search Results */
+.blog-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.blog-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.blog-card-content {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 2rem;
+    align-items: start;
+}
+
+.blog-card-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 /* Author Card */
 .author-card {
-    background: white;
+    background: #ffffff;
     border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .author-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .author-card-content {
@@ -226,7 +266,7 @@ include __DIR__ . '/../includes/header.php';
 .author-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1f2937;
+    color: #111827;
     margin-bottom: 0.5rem;
 }
 
@@ -251,11 +291,11 @@ include __DIR__ . '/../includes/header.php';
     align-items: center;
     gap: 0.5rem;
     color: #6b7280;
-    font-size: 0.9rem;
+    font-size: 0.9375rem;
 }
 
 .author-stat strong {
-    color: #1f2937;
+    color: #111827;
 }
 
 .author-actions {
@@ -269,8 +309,8 @@ include __DIR__ . '/../includes/header.php';
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
     font-weight: 600;
-    border: 2px solid #4f46e5;
-    background: #4f46e5;
+    border: 2px solid #3b82f6;
+    background: #3b82f6;
     color: white;
     cursor: pointer;
     transition: all 0.2s;
@@ -279,13 +319,16 @@ include __DIR__ . '/../includes/header.php';
 }
 
 .follow-btn-search:hover {
-    background: #4338ca;
-    border-color: #4338ca;
+    background: #2563eb;
+    border-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .follow-btn-search.following {
     background: white;
-    color: #4f46e5;
+    color: #111827;
+    border-color: #e5e7eb;
 }
 
 .follow-btn-search.following:hover {
@@ -299,29 +342,32 @@ include __DIR__ . '/../includes/header.php';
     border-radius: 8px;
     font-weight: 600;
     background: #f3f4f6;
-    color: #374151;
+    color: #111827;
     text-decoration: none;
     text-align: center;
     transition: all 0.2s;
+    border: 2px solid #e5e7eb;
 }
 
 .view-profile-btn:hover {
     background: #e5e7eb;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* Category Card */
 .category-card {
-    background: white;
+    background: #ffffff;
     border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .category-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .category-card-content {
@@ -348,13 +394,13 @@ include __DIR__ . '/../includes/header.php';
 .category-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1f2937;
+    color: #111827;
     text-transform: capitalize;
 }
 
 .category-count {
     color: #6b7280;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     margin-top: 0.25rem;
 }
 
@@ -362,37 +408,18 @@ include __DIR__ . '/../includes/header.php';
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
     font-weight: 600;
-    background: #4f46e5;
+    background: #111827;
     color: white;
     text-decoration: none;
     transition: all 0.2s;
+    border: 2px solid #111827;
 }
 
 .view-category-btn:hover {
-    background: #4338ca;
-    transform: translateY(-2px);
-}
-
-/* Reuse blog card styles */
-.blog-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-bottom: 2rem;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.blog-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.blog-card-content {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 1.5rem;
-    padding: 1.5rem;
+    background: #1f2937;
+    border-color: #1f2937;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(17, 24, 39, 0.3);
 }
 
 /* Category colors */
@@ -408,7 +435,64 @@ include __DIR__ . '/../includes/header.php';
 .category-icon.food { background: #fed7aa; }
 .category-icon.other { background: #f3f4f6; }
 
+/* Empty State */
+.empty-state {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 4rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+}
+
+.empty-state h2,
+.empty-state h3 {
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state ul {
+    list-style-position: inside;
+}
+
+/* Admin Badge */
+.admin-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #111827;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: 0.5rem;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+    .search-stats {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .search-tabs {
+        flex-direction: column;
+    }
+    
+    .search-tab {
+        width: 100%;
+    }
+    
+    .blog-card-content {
+        grid-template-columns: 1fr;
+    }
+    
     .author-card-content {
         grid-template-columns: 1fr;
         text-align: center;
@@ -419,14 +503,26 @@ include __DIR__ . '/../includes/header.php';
         margin: 0 auto;
     }
     
-    .author-actions {
-        margin: 0 auto;
+    .author-stats {
+        justify-content: center;
     }
     
-    .blog-card-content {
-        grid-template-columns: 1fr;
+    .author-actions {
+        margin: 0 auto;
+        max-width: 300px;
+    }
+    
+    .category-card-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .category-info {
+        margin-left: 0;
     }
 }
+
 </style>
 
 <main class="main-content">
@@ -474,7 +570,7 @@ include __DIR__ . '/../includes/header.php';
             <div class="search-tabs">
                 <a href="?q=<?php echo urlencode($searchQuery); ?>&tab=posts" 
                    class="search-tab <?php echo $activeTab === 'posts' ? 'active' : ''; ?>">
-                    📝 Posts
+                    Posts
                     <span class="tab-count"><?php echo count($posts); ?></span>
                 </a>
                 <a href="?q=<?php echo urlencode($searchQuery); ?>&tab=authors" 
@@ -484,7 +580,7 @@ include __DIR__ . '/../includes/header.php';
                 </a>
                 <a href="?q=<?php echo urlencode($searchQuery); ?>&tab=categories" 
                    class="search-tab <?php echo $activeTab === 'categories' ? 'active' : ''; ?>">
-                    🏷️ Categories
+                    Categories
                     <span class="tab-count"><?php echo count($categories); ?></span>
                 </a>
             </div>
@@ -645,7 +741,7 @@ include __DIR__ . '/../includes/header.php';
             <?php if ($activeTab === 'categories'): ?>
                 <?php if (empty($categories)): ?>
                     <div class="empty-state">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🏷️</div>
+                        <div style="font-size: 3rem; margin-bottom: 1rem;" class="icon-tag"></div>
                         <h3>No categories found</h3>
                         <p>Try searching for a different category</p>
                     </div>

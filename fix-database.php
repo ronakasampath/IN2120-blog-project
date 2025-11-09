@@ -13,11 +13,11 @@ echo "<h1>Fixing Database Structure...</h1>";
 try {
     $db = getDB();
     
-    // 1. Add category column to blogPost if missing
-    echo "<h2>1. Checking blogPost table...</h2>";
+    // 1. Add category column to blogpost if missing
+    echo "<h2>1. Checking blogpost table...</h2>";
     try {
-        $db->exec("ALTER TABLE blogPost ADD COLUMN category VARCHAR(50) DEFAULT NULL");
-        echo "<p style='color: green;'>✅ Added 'category' column to blogPost</p>";
+        $db->exec("ALTER TABLE blogpost ADD COLUMN category VARCHAR(50) DEFAULT NULL");
+        echo "<p style='color: green;'>✅ Added 'category' column to blogpost</p>";
     } catch (PDOException $e) {
         if (strpos($e->getMessage(), 'Duplicate column') !== false) {
             echo "<p style='color: blue;'>ℹ️ Category column already exists</p>";
@@ -40,7 +40,7 @@ try {
             image_path VARCHAR(255) NOT NULL,
             image_order INT DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (post_id) REFERENCES blogPost(id) ON DELETE CASCADE,
+            FOREIGN KEY (post_id) REFERENCES blogpost(id) ON DELETE CASCADE,
             INDEX idx_post_id (post_id),
             INDEX idx_order (image_order)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
@@ -72,8 +72,8 @@ try {
     // 3. Show final table structure
     echo "<h2>3. Final Table Structure:</h2>";
     
-    echo "<h3>blogPost columns:</h3><ul>";
-    $stmt = $db->query("SHOW COLUMNS FROM blogPost");
+    echo "<h3>blogpost columns:</h3><ul>";
+    $stmt = $db->query("SHOW COLUMNS FROM blogpost");
     while ($col = $stmt->fetch()) {
         echo "<li><strong>{$col['Field']}</strong> - {$col['Type']}</li>";
     }
@@ -88,7 +88,7 @@ try {
     
     // 4. Show sample data
     echo "<h2>4. Current Data:</h2>";
-    $stmt = $db->query("SELECT COUNT(*) as count FROM blogPost");
+    $stmt = $db->query("SELECT COUNT(*) as count FROM blogpost");
     $result = $stmt->fetch();
     echo "<p>Total posts: <strong>{$result['count']}</strong></p>";
     

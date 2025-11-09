@@ -237,8 +237,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Test markdown function
     if (typeof renderMarkdown === 'function') {
-        console.log('✅ renderMarkdown function is available');
+        console.log('Success: renderMarkdown function is available');
     } else {
-        console.error('❌ renderMarkdown function is NOT available');
+        console.error('Error: renderMarkdown function is NOT available');
     }
 });

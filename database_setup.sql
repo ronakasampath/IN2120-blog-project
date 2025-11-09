@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS user (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Blog Posts Table
-CREATE TABLE IF NOT EXISTS blogPost (
+CREATE TABLE IF NOT EXISTS blogpost (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
@@ -37,7 +37,7 @@ INSERT INTO user (username, email, password, role) VALUES
 ('testuser', 'test@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'user');
 
 -- Insert Sample Blog Posts
-INSERT INTO blogPost (user_id, title, content) VALUES 
+INSERT INTO blogpost (user_id, title, content) VALUES 
 (1, 'Welcome to Our Blog Platform', '# Welcome!\n\nThis is a sample blog post to demonstrate our platform.\n\n## Features\n- Easy to use markdown editor\n- User authentication\n- Create, edit, and delete posts\n\nEnjoy blogging!'),
 (1, 'Getting Started with Blogging', '# Getting Started\n\nHere are some tips for your first blog post:\n\n1. Choose an interesting topic\n2. Write engaging content\n3. Use markdown for formatting\n\n**Happy blogging!**');
 
@@ -78,7 +78,7 @@ ALTER TABLE `user`
 ADD COLUMN IF NOT EXISTS `bio` TEXT NULL AFTER `profile_picture`;
 
 -- 4. Verify final structure
-SELECT '✅ Checking final structure...' AS Status;
+SELECT 'Checking final structure...' AS Status;
 DESCRIBE followers;
 DESCRIBE user;
 
@@ -93,6 +93,6 @@ LEFT JOIN user u1 ON f.follower_id = u1.id
 LEFT JOIN user u2 ON f.followed_id = u2.id
 LIMIT 5;
 
-SELECT '✅ Follow system database structure fixed!' AS Result;
+SELECT 'Follow system database structure fixed!' AS Result;
 -- Verify tables created
 SHOW TABLES;

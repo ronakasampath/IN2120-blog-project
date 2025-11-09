@@ -41,7 +41,7 @@ echo "<h2>Database Tables:</h2>";
 require_once 'config/database.php';
 $db = getDB();
 $tables = $db->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
-    foreach (['user', 'blogPost', 'comments', 'likes', 'post_images'] as $table) {
+    foreach (['user', 'blogpost', 'comments', 'likes', 'post_images'] as $table) {
         $exists = in_array($table, $tables);
         $color = $exists ? 'green' : 'red';
         $status = $exists ? 'EXISTS' : 'MISSING';

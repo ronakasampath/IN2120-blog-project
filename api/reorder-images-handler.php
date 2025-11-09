@@ -54,7 +54,7 @@ try {
     $db = getDB();
     
     // Verify post ownership
-    $stmt = $db->prepare("SELECT user_id FROM blogPost WHERE id = ?");
+    $stmt = $db->prepare("SELECT user_id FROM blogpost WHERE id = ?");
     $stmt->execute([$postId]);
     $post = $stmt->fetch(PDO::FETCH_ASSOC);
     

@@ -53,7 +53,7 @@ if (!$postId) {
 // Verify ownership
 try {
     $db = getDB();
-    $stmt = $db->prepare("SELECT user_id FROM blogPost WHERE id = ?");
+    $stmt = $db->prepare("SELECT user_id FROM blogpost WHERE id = ?");
     $stmt->execute([$postId]);
     $post = $stmt->fetch();
     

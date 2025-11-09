@@ -49,7 +49,7 @@ try {
     $db = getDB();
     
     // Check post ownership
-    $stmt = $db->prepare("SELECT user_id FROM blogPost WHERE id = ?");
+    $stmt = $db->prepare("SELECT user_id FROM blogpost WHERE id = ?");
     $stmt->execute([$postId]);
     $post = $stmt->fetch();
     
@@ -67,7 +67,7 @@ try {
     
     // Update post
     $stmt = $db->prepare("
-        UPDATE blogPost 
+        UPDATE blogpost 
         SET title = ?, content = ?, category = ?, updated_at = CURRENT_TIMESTAMP 
         WHERE id = ?
     ");

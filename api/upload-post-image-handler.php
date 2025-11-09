@@ -4,6 +4,21 @@
  * Save as: api/upload-post-images-handler.php
  */
 
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Log incoming data for debugging
+file_put_contents(__DIR__ . '/debug.log', print_r([
+    'POST' => $_POST,
+    'FILES' => $_FILES,
+    'REQUEST_METHOD' => $_SERVER['REQUEST_METHOD']
+], true));
+
+// Your existing handler code below...
+
+
+
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
@@ -53,7 +68,7 @@ if (!$postId) {
 // Verify ownership
 try {
     $db = getDB();
-    $stmt = $db->prepare("SELECT user_id FROM blogPost WHERE id = ?");
+    $stmt = $db->prepare("SELECT user_id FROM blogpost WHERE id = ?");
     $stmt->execute([$postId]);
     $post = $stmt->fetch();
     

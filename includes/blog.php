@@ -21,7 +21,7 @@ function createPost($userId, $title, $content, $category = 'general') {
     }
     
     try {
-        $stmt = $db->prepare("INSERT INTO blogPost (user_id, title, content, category) VALUES (?, ?, ?, ?)");
+        $stmt = $db->prepare("INSERT INTO blogpost (user_id, title, content, category) VALUES (?, ?, ?, ?)");
         $stmt->execute([$userId, trim($title), trim($content), $category]);
         
         return [
@@ -50,7 +50,7 @@ function getAllPosts() {
                 bp.updated_at,
                 u.username,
                 u.id as user_id
-            FROM blogPost bp
+            FROM blogpost bp
             JOIN user u ON bp.user_id = u.id
             ORDER BY bp.created_at DESC
         ");
@@ -76,7 +76,7 @@ function getPost($postId) {
                 bp.updated_at,
                 bp.user_id,
                 u.username
-            FROM blogPost bp
+            FROM blogpost bp
             JOIN user u ON bp.user_id = u.id
             WHERE bp.id = ?
         ");
@@ -102,7 +102,7 @@ function getPostsByUser($userId) {
                 bp.created_at, 
                 bp.updated_at,
                 u.username
-            FROM blogPost bp
+            FROM blogpost bp
             JOIN user u ON bp.user_id = u.id
             WHERE bp.user_id = ?
             ORDER BY bp.created_at DESC
@@ -138,7 +138,7 @@ function updatePost($postId, $userId, $title, $content, $category = 'general') {
     }
     
     try {
-        $stmt = $db->prepare("UPDATE blogPost SET title = ?, content = ?, category = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+        $stmt = $db->prepare("UPDATE blogpost SET title = ?, content = ?, category = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
         $stmt->execute([trim($title), trim($content), $category, $postId]);
         return ['success' => true, 'message' => 'Post updated successfully!'];
     } catch (PDOException $e) {
@@ -167,7 +167,7 @@ function deletePost(int $postId, int $userId): array
 
     // Perform the deletion
     try {
-        $stmt = $db->prepare("DELETE FROM blogPost WHERE id = :id");
+        $stmt = $db->prepare("DELETE FROM blogpost WHERE id = :id");
         $stmt->execute(['id' => $postId]);
 
         if ($stmt->rowCount() > 0) {

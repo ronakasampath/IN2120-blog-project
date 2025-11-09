@@ -1,12 +1,14 @@
 <?php
 /**
- * Update Post Handler - FULLY FIXED
+ * Update Post Handler - WITH CATEGORY SUPPORT
  * Save as: api/update-post-handler.php
  */
 
+error_reporting(0);
+ini_set('display_errors', 0);
+
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/blog.php';
 
 header('Content-Type: application/json');
 
@@ -16,17 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Check authentication
 if (!isLoggedIn()) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Please login first']);
     exit;
 }
 
-// Get current user (needs session)
 $currentUser = getCurrentUser();
-
-// Verify CSRF token (needs session)
 $csrfToken = $_POST['csrf_token'] ?? '';
 if (!verifyCSRF($csrfToken)) {
     http_response_code(403);
@@ -34,23 +32,58 @@ if (!verifyCSRF($csrfToken)) {
     exit;
 }
 
-// NOW close session - we have all the data we need
 session_write_close();
 
-// Get form data
 $postId = intval($_POST['post_id'] ?? 0);
 $title = trim($_POST['title'] ?? '');
 $content = trim($_POST['content'] ?? '');
+$category = trim($_POST['category'] ?? '');
 
-// Update post
-$result = updatePost($postId, $currentUser['id'], $title, $content);
-
-if ($result['success']) {
-    http_response_code(200);
-} else {
+if (!$postId || !$title || !$content) {
     http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Missing required fields']);
+    exit;
 }
 
-echo json_encode($result);
-exit;
+try {
+    $db = getDB();
+    
+    // Check post ownership
+    $stmt = $db->prepare("SELECT user_id FROM blogPost WHERE id = ?");
+    $stmt->execute([$postId]);
+    $post = $stmt->fetch();
+    
+    if (!$post) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Post not found']);
+        exit;
+    }
+    
+    if ($post['user_id'] != $currentUser['id'] && !isAdmin()) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        exit;
+    }
+    
+    // Update post
+    $stmt = $db->prepare("
+        UPDATE blogPost 
+        SET title = ?, content = ?, category = ?, updated_at = CURRENT_TIMESTAMP 
+        WHERE id = ?
+    ");
+    $stmt->execute([$title, $content, $category, $postId]);
+    
+    http_response_code(200);
+    echo json_encode([
+        'success' => true,
+        'message' => 'Post updated successfully!'
+    ]);
+    
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database error: ' . $e->getMessage()
+    ]);
+}
 ?>

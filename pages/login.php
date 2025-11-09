@@ -66,32 +66,35 @@ include __DIR__ . '/../includes/header.php';
     </main>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const messageDiv = document.getElementById('message');
+        const formData = new FormData(this);
+        
+        messageDiv.innerHTML = '<div class="alert alert-info">Logging in...</div>';
+        
+        try {
+            const response = await fetch('<?php echo SITE_URL; ?>/api/login-handler.php', {
+                method: 'POST',
+                body: formData
+            });
             
-            const messageDiv = document.getElementById('message');
-            const formData = new FormData(this);
+            const result = await response.json();
             
-            try {
-                const response = await fetch('<?php echo SITE_URL; ?>/api/login-handler.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    messageDiv.innerHTML = '<div class="alert alert-success">' + result.message + '</div>';
-                    setTimeout(() => {
-                        window.location.href = '<?php echo SITE_URL; ?>/index.php';
-                    }, 1000);
-                } else {
-                    messageDiv.innerHTML = '<div class="alert alert-error">' + result.message + '</div>';
-                }
-            } catch (error) {
-                messageDiv.innerHTML = '<div class="alert alert-error">An error occurred. Please try again.</div>';
+            if (result.success) {
+                messageDiv.innerHTML = '<div class="alert alert-success">' + result.message + '</div>';
+                setTimeout(() => {
+                    window.location.href = '<?php echo SITE_URL; ?>/index.php';
+                }, 1000);
+            } else {
+                messageDiv.innerHTML = '<div class="alert alert-error">' + result.message + '</div>';
             }
-        });
-    </script>
+        } catch (error) {
+            console.error('Error:', error);
+            messageDiv.innerHTML = '<div class="alert alert-error">Login failed. Please try again.</div>';
+        }
+    });
+</script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

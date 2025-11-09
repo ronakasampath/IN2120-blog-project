@@ -1,13 +1,10 @@
 <?php
 /**
- * Database Configuration - NO ERRORS VERSION
+ * Database Configuration - FIXED VERSION
  * Save as: config/database.php
  */
 
 // Load environment variables from .env file
-
-
-
 function loadEnv($path) {
     if (!file_exists($path)) {
         echo "ERROR: .env file not found at: " . htmlspecialchars($path) . "<br>";
@@ -50,15 +47,14 @@ if (!defined('SITE_NAME')) define('SITE_NAME', 'My Blog');
 if (!defined('SITE_URL')) define('SITE_URL', 'http://localhost/blog-app');
 if (!defined('APP_ENV')) define('APP_ENV', 'development');
 if (!defined('APP_DEBUG')) define('APP_DEBUG', 'true');
-if (!defined('SESSION_LIFETIME')) define('SESSION_LIFETIME', '3600');
-if (!defined('HASH_COST')) define('HASH_COST', '12');
+if (!defined('SESSION_LIFETIME')) define('SESSION_LIFETIME', 3600); // INTEGER, not string
+if (!defined('HASH_COST')) define('HASH_COST', 12); // INTEGER
 if (!defined('APP_TIMEZONE')) define('APP_TIMEZONE', 'Asia/Colombo');
 
 // Set timezone
 date_default_timezone_set(APP_TIMEZONE);
 
 // Error reporting based on environment
-// Convert APP_DEBUG to boolean safely
 $appDebug = filter_var(APP_DEBUG, FILTER_VALIDATE_BOOLEAN);
 
 if ($appDebug) {
@@ -70,6 +66,12 @@ if ($appDebug) {
     ini_set('display_errors', '0');
 }
 
+// START SESSION HERE
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.gc_maxlifetime', SESSION_LIFETIME);
+    ini_set('session.cookie_lifetime', SESSION_LIFETIME);
+    session_start();
+}
 
 /**
  * Get database connection

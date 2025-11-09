@@ -20,31 +20,31 @@ $folders = [
 ];
 
 echo "<h2>Files:</h2>";
-foreach ($files as $file) {
-    $exists = file_exists(__DIR__ . '/' . $file);
-    $color = $exists ? 'green' : 'red';
-    $status = $exists ? '✓ EXISTS' : '✗ MISSING';
-    echo "<p style='color: $color;'>$status - $file</p>";
-}
+    foreach ($files as $file) {
+        $exists = file_exists(__DIR__ . '/' . $file);
+        $color = $exists ? 'green' : 'red';
+        $status = $exists ? 'EXISTS' : 'MISSING';
+        echo "<p style='color: $color;'>$status - $file</p>";
+    }
 
 echo "<h2>Folders:</h2>";
-foreach ($folders as $folder) {
-    $path = __DIR__ . '/' . $folder;
-    $exists = is_dir($path);
-    $writable = is_writable($path);
-    $color = ($exists && $writable) ? 'green' : 'red';
-    $status = $exists ? ($writable ? '✓ EXISTS & WRITABLE' : '⚠ EXISTS BUT NOT WRITABLE') : '✗ MISSING';
-    echo "<p style='color: $color;'>$status - $folder</p>";
-}
+    foreach ($folders as $folder) {
+        $path = __DIR__ . '/' . $folder;
+        $exists = is_dir($path);
+        $writable = is_writable($path);
+        $color = ($exists && $writable) ? 'green' : 'red';
+        $status = ($exists) ? ($writable ? 'EXISTS & WRITABLE' : 'EXISTS BUT NOT WRITABLE') : 'MISSING';
+        echo "<p style='color: $color;'>$status - $folder</p>";
+    }
 
 echo "<h2>Database Tables:</h2>";
 require_once 'config/database.php';
 $db = getDB();
 $tables = $db->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
-foreach (['user', 'blogPost', 'comments', 'likes', 'post_images'] as $table) {
-    $exists = in_array($table, $tables);
-    $color = $exists ? 'green' : 'red';
-    $status = $exists ? '✓ EXISTS' : '✗ MISSING';
-    echo "<p style='color: $color;'>$status - $table</p>";
-}
+    foreach (['user', 'blogPost', 'comments', 'likes', 'post_images'] as $table) {
+        $exists = in_array($table, $tables);
+        $color = $exists ? 'green' : 'red';
+        $status = $exists ? 'EXISTS' : 'MISSING';
+        echo "<p style='color: $color;'>$status - $table</p>";
+    }
 ?>

@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['test_image'])) {
     echo "<p>Moving to: $destination</p>";
     
     if (move_uploaded_file($tmpName, $destination)) {
-        echo "<h2 style='color: green;'>✅ SUCCESS!</h2>";
+    echo "<h2 style='color: green;'>SUCCESS!</h2>";
         echo "<p>File saved: $newName</p>";
         echo "<img src='uploads/posts/$newName' style='max-width: 400px;'>";
     } else {

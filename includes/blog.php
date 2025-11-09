@@ -9,7 +9,7 @@ require_once __DIR__ . '/blog-enhanced.php';
 /**
  * Create blog post
  */
-function createPost($userId, $title, $content) {
+function createPost($userId, $title, $content, $category = 'general') {
     $db = getDB();
     
     if (empty(trim($title))) {
@@ -21,8 +21,8 @@ function createPost($userId, $title, $content) {
     }
     
     try {
-        $stmt = $db->prepare("INSERT INTO blogPost (user_id, title, content) VALUES (?, ?, ?)");
-        $stmt->execute([$userId, trim($title), trim($content)]);
+        $stmt = $db->prepare("INSERT INTO blogPost (user_id, title, content, category) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$userId, trim($title), trim($content), $category]);
         
         return [
             'success' => true,
@@ -117,7 +117,7 @@ function getPostsByUser($userId) {
 /**
  * Update post - Admin can edit any post
  */
-function updatePost($postId, $userId, $title, $content) {
+function updatePost($postId, $userId, $title, $content, $category = 'general') {
     $db = getDB();
     
     if (empty(trim($title))) {
@@ -128,25 +128,24 @@ function updatePost($postId, $userId, $title, $content) {
         return ['success' => false, 'message' => 'Content is required'];
     }
     
-    // Check if post exists
     $post = getPost($postId);
     if (!$post) {
         return ['success' => false, 'message' => 'Post not found'];
     }
     
-    // Check ownership - Allow if user owns post OR user is admin
     if ($post['user_id'] != $userId && !isAdmin()) {
         return ['success' => false, 'message' => 'Unauthorized'];
     }
     
     try {
-        $stmt = $db->prepare("UPDATE blogPost SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
-        $stmt->execute([trim($title), trim($content), $postId]);
+        $stmt = $db->prepare("UPDATE blogPost SET title = ?, content = ?, category = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+        $stmt->execute([trim($title), trim($content), $category, $postId]);
         return ['success' => true, 'message' => 'Post updated successfully!'];
     } catch (PDOException $e) {
         return ['success' => false, 'message' => 'Failed to update post'];
     }
 }
+
 
 /**
  * Delete post - Admin can delete any post
